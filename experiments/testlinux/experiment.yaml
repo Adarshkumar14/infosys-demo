@@ -1,0 +1,51 @@
+apiVersion: litmuschaos.io/v1alpha1
+kind: LinuxChaosExperiment
+metadata:
+  creationTimestamp: null
+  name: testlinux
+spec:
+  experimentId: ""
+  experimentRunId: ""
+  steps:
+  - - name: linux-disk-fill-1p8
+  - - name: linux-service-restart-wso
+  tasks:
+  - chaosInfra: ""
+    definition:
+      chaos:
+        diskFillChaos/inputs:
+          dataBlockSize: 256k
+          duration: 30s
+          fillStorage: 50%
+        experiment: linux-disk-fill
+        probes:
+        - mode: Continuous
+          name: linuxcommand
+          runProperties:
+            attempt: 0
+          type: ""
+    name: linux-disk-fill-1p8
+    taskType: chaos
+    weight: 10
+  - chaosInfra: ""
+    definition:
+      chaos:
+        experiment: linux-service-restart
+        probes:
+        - mode: OnChaos
+          name: linuxcmdprobe
+          runProperties:
+            attempt: 0
+          type: ""
+        serviceRestartChaos/inputs:
+          duration: 30s
+          interval: 30s
+          selfHealingServices: true
+          sequence: parallel
+          services: apps
+    name: linux-service-restart-wso
+    taskType: chaos
+    weight: 10
+status:
+  finishedAt: null
+  startedAt: null
